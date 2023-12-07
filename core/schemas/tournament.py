@@ -1,6 +1,6 @@
-from typing import List, Optional
+from typing import Optional
 
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel
 
 
 class TournamentBase(BaseModel):
@@ -14,7 +14,7 @@ class TournamentRegistration(BaseModel):
 
 class CreateCompetitor(BaseModel):
     name: str
-    description: str
+    description: Optional[str] = None
 
     class Config:
         from_attributes = True

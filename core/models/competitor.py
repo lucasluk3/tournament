@@ -12,7 +12,7 @@ class Competitor(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String)
-    description = Column(String)
+    description = Column(String,  nullable=True)
 
     tournament_id = Column(Integer, ForeignKey("tournaments.id"), nullable=True)
     tournament = relationship("Tournament", back_populates="competitors", lazy="joined")
