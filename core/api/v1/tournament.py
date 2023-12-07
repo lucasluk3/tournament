@@ -17,7 +17,7 @@ from core.models.tournament import Tournament
 from core.schemas.tournament import (
     TournamentBase, CompetitorReadOnly,
     CreateCompetitor, MatchesBase,
-    RegisterResult, PodiumSchema
+    RegisterResult, PodiumSchema, TournamentRegistration
 )
 
 router = APIRouter(
@@ -37,7 +37,7 @@ async def list_tournaments(db: Session = Depends(get_db)):
 
 
 @router.post('/', response_model=TournamentBase)
-async def create_tournament(tournament: TournamentBase, db: Session = Depends(get_db)):
+async def create_tournament(tournament: TournamentRegistration, db: Session = Depends(get_db)):
     """
     Create a new tournament
     """
@@ -62,13 +62,17 @@ async def create_competitor(
     except NoResultFound:
         return JSONResponse(status_code=404, content='Tournament not found')
 
+    competitors = db.query(Competitor).filter(Competitor.tournament_id == tournament_id).all()
+    if competitor.name in [competitor.name for competitor in competitors]:
+        return JSONResponse(status_code=400, content='Competitor already exists')
+
     competitor_db = Competitor(
         **competitor.model_dump(), tournament=tournament, tournament_id=tournament_id,
     )
     db.add(competitor_db)
     db.commit()
     db.refresh(competitor_db)
-    return competitor
+    return competitor_db
 
 
 @router.get('/{tournament_id}/generate-matches', response_model=List[MatchesBase])

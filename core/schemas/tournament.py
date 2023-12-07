@@ -1,12 +1,15 @@
 from typing import List, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 
 class TournamentBase(BaseModel):
+    id:  int
     name: str
-    total_matches: int
-    total_rounds: int
+
+
+class TournamentRegistration(BaseModel):
+    name: str
 
 
 class CreateCompetitor(BaseModel):
@@ -20,9 +23,6 @@ class CreateCompetitor(BaseModel):
 class CompetitorReadOnly(BaseModel):
     id: int
     name: str
-
-    class Config:
-        from_attributes = True
 
 
 class RegisterResult(BaseModel):
