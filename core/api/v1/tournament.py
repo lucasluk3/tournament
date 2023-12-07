@@ -84,9 +84,12 @@ async def generate_initial_tournament_matches(
     except NoResultFound:
         return JSONResponse(status_code=404, content='Tournament not found')
 
-    competitors = db.query(Competitor).filter(
-        Competitor.tournament_id == tournament_id
-    ).order_by(func.random()).all()
+    competitors = (
+        db.query(Competitor)
+        .filter(Competitor.tournament_id == tournament_id)
+        .order_by(func.random())
+        .all()
+    )
 
     competitors_length = len(competitors)
     if not competitors_length:
@@ -138,7 +141,11 @@ async def list_matches(
     """
     List all matches of a tournament
     """
-    matches = db.query(Match).filter(Match.tournament_id == tournament_id).filter(Match.results.is_(None)).all()
+    matches = (
+        db.query(Match)
+        .filter(Match.tournament_id == tournament_id)
+        .filter(Match.results == None).all()
+    )
     return matches
 
 
@@ -158,7 +165,11 @@ async def register_match_result(
         return JSONResponse(status_code=404, content='Tournament not found')
 
     try:
-        match = db.query(Match).filter(Match.id == match_id, Match.tournament_id == tournament_id).one()
+        match = (
+            db.query(Match)
+            .filter(Match.id == match_id, Match.tournament_id == tournament_id)
+            .one()
+        )
     except NoResultFound:
         return JSONResponse(status_code=404, content='Match not found')
 
@@ -196,7 +207,7 @@ async def register_match_result(
                 Match.round == 2,
                 Match.tournament_id == tournament_id,
                 Match.status == 'third_place',
-                Match.competitor_two.is_(None)
+                Match.competitor_two == None
             ).one()
         except NoResultFound:
             third_place_match = Match(
@@ -222,10 +233,12 @@ async def register_match_result(
         db.commit()
         db.refresh(tournament)
     try:
-        next_match = db.query(Match).filter(
-            Match.tournament_id == tournament_id,
-            Match.status != 'third_place',
-        ).filter(or_(Match.competitor_one.is_(None), Match.competitor_two.is_(None))).one()
+        next_match = (
+            db.query(Match)
+            .filter(Match.tournament_id == tournament_id, Match.status != 'third_place')
+            .filter(or_(Match.competitor_one == None, Match.competitor_two == None))
+            .one()
+        )
         next_match.match_number = tournament.total_matches
     except NoResultFound:
         next_match = Match(

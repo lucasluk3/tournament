@@ -39,18 +39,14 @@ class ResultBase(BaseModel):
 
 class MatchesBase(BaseModel):
     id: int
-    match_number: Optional[int] = None
-    tournament: TournamentBase
     competitor_one: CompetitorReadOnly
     competitor_two: Optional[CompetitorReadOnly] = None
-    # result: ResultBase
 
     class Config:
         from_attributes = True
 
 
 class PodiumSchema(BaseModel):
-    id:  int
     first_place: Optional[CompetitorReadOnly] = None
     second_place: Optional[CompetitorReadOnly] = None
     third_place: Optional[CompetitorReadOnly] = None
